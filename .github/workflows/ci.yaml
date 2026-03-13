@@ -75,19 +75,28 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-
 
-    - name: Build image (multi-arch)
+    - name: Build image (amd64)
       id: docker_build
       uses: docker/build-push-action@v6
       with:
         context: ./
         file: ./docker/Dockerfile
         builder: ${{ steps.buildx.outputs.name }}
-        platforms: linux/amd64,linux/arm64
         push: false
         load: true
         tags: dnationcloud/kubernetes-jsonnet-translator:test
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
+
+    - name: Build image (arm64)
+      uses: docker/build-push-action@v6
+      with:
+        context: ./
+        file: ./docker/Dockerfile
+        builder: ${{ steps.buildx.outputs.name }}
+        platforms: linux/arm64
+        push: false
+        cache-from: type=local,src=/tmp/.buildx-cache
 
     - name: Fetch history
       run: git fetch --prune --unshallow
